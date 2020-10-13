@@ -21,18 +21,9 @@ def move(state):
     n = len(grid)
     for pos in move_blank(i, j, n):
         i1, j1 = pos
-        grid[i][j], grid[i1][j1] = grid[i1][j1], grid[i][j]  # swap
-        yield [i1, j1, grid]
-        grid[i][j], grid[i1][j1] = grid[i1][j1], grid[i][j]  # swap back
-
-
-def get_all_moves(node, memory):
-    all_moves = set()
-    for next_state in move(node):
-        temp = copy.deepcopy(next_state)
-        if temp not in memory:
-            all_moves.add(temp)
-    return all_moves
+        new_grid = copy.deepcopy(grid)
+        new_grid[i][j], new_grid[i1][j1] = grid[i1][j1], grid[i][j]  # swap
+        yield [i1, j1, new_grid]
 
 
 def search(root, goal_state):
@@ -40,14 +31,14 @@ def search(root, goal_state):
     memory = set()
     while True:
         depth += 1
-        found, remaining = depth_limited(root, depth, goal_state, memory)
+        found, remaining = dls(root, depth, goal_state, memory)
         if found is not None:
             return found
         elif not remaining:
             return None
 
 
-def depth_limited(node, depth, goal_state, memory):
+def dls(node, depth, goal_state, memory):
     print('Current node: ' + node.__str__())
 
     if depth == 0:
@@ -57,9 +48,9 @@ def depth_limited(node, depth, goal_state, memory):
             return None, True  # not a solution, but might have children
     elif depth > 0:
         any_remaining = False
-        for child in get_all_moves(node, memory):
-            found, remaining = depth_limited(child, depth-1, goal_state,
-                                             memory)
+        for child in move(node):
+            found, remaining = dls(child, depth - 1, goal_state,
+                                   memory)
             if found is not None:
                 return found, True
             if remaining is True:
@@ -83,8 +74,13 @@ def main():
     ]
     goal_state = [2, 2, [[1, 2, 3], [4, 5, 6], [7, 8, 0]]]
 
-    first_goal = search(initial_states[0], goal_state)
-    print(first_goal.__str__())
+    #first_goal = search(initial_states[0], goal_state)
+    #print(first_goal.__str__())
+
+    print('initial: ' + initial_states[0].__str__())
+    for next_state in move(initial_states[0]):
+        print(next_state.__str__())
+    print('final: ' + initial_states[0].__str__())
 
 
 if __name__ == '__main__':
