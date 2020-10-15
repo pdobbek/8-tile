@@ -1,4 +1,5 @@
-import copy
+import copy  # used only in move(state) function.
+import time  # used only in solve() function.
 
 """
 -----------------------------------
@@ -189,6 +190,7 @@ def dfs_cycle(path, depth):
     if depth == 0 and is_goal(path[-1]):
         return path
     elif depth > 0:
+        print(depth.__str__())
         for next_state in move(path[-1]):
             if next_state not in path:
                 next_path = path + [next_state]
@@ -198,10 +200,32 @@ def dfs_cycle(path, depth):
     return None
 
 
-def main():
-    import time
+def solve(puzzle):
+    """
+    Solves the 8-tile puzzle and prints results to stdout.
+    :param puzzle: list
+        8-tile puzzle state to be solved.
+    :return: list
+        list of 8-tile puzzle states that forms the path to the solution.
+        Solution is at index [-1]. Initial state is at index [0].
+    """
     global move_counter
+    move_counter = 0  # reset global var
 
+    start_time = time.time()
+    final_path = ids(puzzle)
+    end_time = time.time()
+
+    print('-----------------------------------')
+    print('initial state: ' + puzzle.__str__())
+    print('number of moves: ' + (len(final_path) - 1).__str__())
+    print('calls to move: ' + move_counter.__str__())
+    print('timer (seconds): ' + (end_time - start_time).__str__())
+    print('-----------------------------------')
+    return final_path
+
+
+def main():
     initial_states = [
         [0, 0, [[0, 7, 1], [4, 3, 2], [8, 6, 5]]],
         [0, 2, [[5, 6, 0], [1, 3, 8], [4, 7, 2]]],
@@ -217,18 +241,7 @@ def main():
     ]
 
     for puzzle in initial_states:
-        move_counter = 0  # reset global var
-
-        start_time = time.time()
-        final_path = ids(puzzle)
-        end_time = time.time()
-
-        print('-----------------------------------')
-        print('initial state: ' + puzzle.__str__())
-        print('number of moves: ' + (len(final_path) - 1).__str__())
-        print('calls to move: ' + move_counter.__str__())
-        print('timer (seconds): ' + (end_time - start_time).__str__())
-        print('-----------------------------------')
+        solve(puzzle)
 
 
 if __name__ == '__main__':
