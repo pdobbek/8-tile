@@ -190,7 +190,6 @@ def dfs_cycle(path, depth):
     if depth == 0 and is_goal(path[-1]):
         return path
     elif depth > 0:
-        print(depth.__str__())
         for next_state in move(path[-1]):
             if next_state not in path:
                 next_path = path + [next_state]
