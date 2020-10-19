@@ -1,67 +1,93 @@
 import copy
+import math
 import sys
 import time
-"""
-- keeps track of each visited node. (closed list)
-- has a list of all the nodes that are left to be explored. (open list)
-- initially, the open list holds the root node.
-- the next node chosen from the open list  is based on its f score (node
-lowest f score is picked).
-- f_score = h_score - g_score
-- h_score: how far the goal node is. In 8-puzzle this can be defined as
-number of misplaced tiles.
-- g_score: the number of nodes traversed from root node to this node.
 
-How to solve 8-puzzle with A*:
-- set depth to 0.
-- move the 0 in all possible directions.
-- calculate the f_score for each state.
-- push root into closed_list and all the new states into open_list.
-- set depth to the lowest f_score in the open_list.
-- select state in open_list with lowest f_score and repeat.
-"""
 
 goal_state = [2, 2, [[1, 2, 3], [4, 5, 6], [7, 8, 0]]]
+goal_pos_dict = {
+            1: (0, 0), 2: (0, 1), 3: (0, 2),
+            4: (1, 0), 5: (1, 1), 6: (1, 2),
+            7: (2, 0), 8: (2, 1), 0: (2, 2)
+        }
 move_counter = 0
 
 
 class Node:
+    """
+    Class describing a state of an n-tile puzzle.
+    """
 
     def __init__(self, state, g=0):
+        """
+        :param state: list
+            list of lists containing the position of the blank state and
+            the rows of the puzzle.
+        :param g: int
+            default=0
+            number of moves away from root. When creating a new puzzle,
+            parameter should be omitted.
+        """
         self.state = state
         self.h = self.__calculate_h()
         self.g = g
         self.f = self.h + g
 
     @property
-    def blank_pos(self):
+    def blank_pos(self) -> (int, int):
+        """
+        :return: (int, int)
+            co-ordinates of the 0 tile.
+        """
         return self.state[0], self.state[1]
 
     @property
-    def grid(self):
+    def grid(self) -> list:
+        """
+        :return: list
+            grid part of the original puzzle array. I.e.
+                [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
+        """
         return self.state[2]
 
     @property
-    def is_goal(self):
+    def is_goal(self) -> bool:
+        """
+        :return: bool
+            True if this Node contains a state identical to the goal
+            state. False otherwise.
+        """
         return self.h == 0
 
     def __calculate_h(self) -> int:
+        # expression to programmatically find goal row and column of any value,
+        # for a puzzle of any size (doesn't have to be square). The goal state
+        # has to follow format of 1, 2, 3, 4, 5, 6, .. 0.
+        # v = value, n = number of column
+        # (v-1)%n <- column
+        # floor((v-1)/3) <- row
         h = 0
-        n = len(self.grid)
-        for i in range(n):  # for each row in state
-            for j in range(n):  # for each number in row
-                if self.grid[i][j] != goal_state[2][i][j]:
-                    h += 1  # if not the same as goal state
+        for i in range(len(self.grid)):
+            for j in range(len(self.grid[i])):
+                goal_pos = self.__goal_position(self.grid[i][j])
+                h += abs(i - goal_pos[0]) + abs(j - goal_pos[1])
         return h
+
+    def __goal_position(self, v) -> (int, int):
+        n = len(self.grid[0])  # number of columns
+        m = len(self.grid)  # number of rows
+        if v == 0:
+            return (n-1), (m-1)  # blank tile at the end of puzzle
+        row = math.floor((v - 1) / n)
+        column = (v - 1) % n
+        return row, column
 
     def move(self):  # node
         """
         Generator which yields a new state for each possible move after moving
-        the blank tile with move_blank function.
-        Doesn't change the arg state.
+        the blank tile with _move_blank function.
+        Doesn't change this state.
         Increment the move_counter global variable each time it's called.
-        :param state: list
-            state to base the yielded states on.
         :return:
             new Node with state after blank tile move.
         """
@@ -74,15 +100,9 @@ class Node:
             new_grid[i][j], new_grid[i1][j1] = grid[i1][j1], grid[i][j]  # swap
             yield Node([i1, j1, new_grid], self.g+1)
 
-    def _move_blank(self):
+    def _move_blank(self) -> (int, int):
         """
         Generator which moves the blank tile (prefers order of NSEW).
-        :param i: int
-            row index of the blank tile.
-        :param j: int
-            column index of the blank tile.
-        :param n: int
-            number of rows and columns in the puzzle.
         :return: (int, int)
             tuple of new blank tile row and column index.
         """
@@ -120,7 +140,7 @@ class Node:
         return self.f > other.f
 
 
-def _ida_star(root):
+def _ida_star(root) -> list:
     """
     Begins the IDA* search for solution to the puzzle passed. Solution
     is compared against the goal_state global variable.
@@ -161,7 +181,7 @@ def _ida_star_search(path, depth) -> (int, Node):
     return lowest_f, node
 
 
-def solve(puzzle):
+def solve(puzzle) -> list:
     """
     Solves the 8-tile puzzle and prints results to stdout.
     :param puzzle: list
