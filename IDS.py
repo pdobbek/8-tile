@@ -86,7 +86,7 @@ like so;
 
 # Global variables
 goal_state = [2, 2, [[1, 2, 3], [4, 5, 6], [7, 8, 0]]]
-move_counter = 0  # how many calls to the 'move' functions were performed
+_move_counter = 0  # how many calls to the 'move' functions were performed
 
 
 def is_goal(state):
@@ -141,8 +141,8 @@ def move(state):
     :return:
         state after blank tile move.
     """
-    global move_counter
-    move_counter += 1
+    global _move_counter
+    _move_counter += 1
     [i, j, grid] = state  # make note of current state
     n = len(grid)
     for pos in move_blank(i, j, n):
@@ -162,7 +162,7 @@ def ids(root):
         8-tile puzzle state represented by a list of lists. I.e.
             [0, 0, [[0, 7, 1], [4, 3, 2], [8, 6, 5]]]
     :return: list
-        solution 8-tile puzzle state that is the solution.
+        list of Nodes that make up the path to the solution.
     """
     depth = 0
     path = [root]
@@ -208,8 +208,8 @@ def solve(puzzle):
         list of 8-tile puzzle states that forms the path to the solution.
         Solution is at index [-1]. Initial state is at index [0].
     """
-    global move_counter
-    move_counter = 0  # reset global var
+    global _move_counter
+    _move_counter = 0  # reset global var
 
     start_time = time.time()
     final_path = ids(puzzle)
@@ -218,7 +218,7 @@ def solve(puzzle):
     print('-----------------------------------')
     print('initial state: ' + puzzle.__str__())
     print('number of moves: ' + (len(final_path) - 1).__str__())
-    print('calls to move: ' + move_counter.__str__())
+    print('calls to move: ' + _move_counter.__str__())
     print('timer (seconds): ' + (end_time - start_time).__str__())
     print('-----------------------------------')
     return final_path

@@ -1,21 +1,105 @@
 import copy
-import math
 import sys
 import time
 
+"""
+-----------------------------------
+initial state: [0, 0, [[0, 7, 1], [4, 3, 2], [8, 6, 5]]]
+number of moves: 16
+calls to move: 251
+timer (seconds): 0.012261390686035156
+-----------------------------------
+-----------------------------------
+initial state: [0, 2, [[5, 6, 0], [1, 3, 8], [4, 7, 2]]]
+number of moves: 18
+calls to move: 725
+timer (seconds): 0.035470008850097656
+-----------------------------------
+-----------------------------------
+initial state: [2, 0, [[3, 5, 6], [1, 2, 7], [0, 8, 4]]]
+number of moves: 20
+calls to move: 1043
+timer (seconds): 0.06723213195800781
+-----------------------------------
+-----------------------------------
+initial state: [1, 1, [[7, 3, 5], [4, 0, 2], [8, 1, 6]]]
+number of moves: 18
+calls to move: 1591
+timer (seconds): 0.07620549201965332
+-----------------------------------
+-----------------------------------
+initial state: [2, 0, [[6, 4, 8], [7, 1, 3], [0, 2, 5]]]
+number of moves: 18
+calls to move: 211
+timer (seconds): 0.00981593132019043
+-----------------------------------
+-----------------------------------
+initial state: [0, 2, [[3, 2, 0], [6, 1, 8], [4, 7, 5]]]
+number of moves: 18
+calls to move: 389
+timer (seconds): 0.017934322357177734
+-----------------------------------
+-----------------------------------
+initial state: [0, 0, [[0, 1, 8], [3, 6, 7], [5, 4, 2]]]
+number of moves: 20
+calls to move: 136
+timer (seconds): 0.005845069885253906
+-----------------------------------
+-----------------------------------
+initial state: [2, 0, [[6, 4, 1], [7, 3, 2], [0, 5, 8]]]
+number of moves: 14
+calls to move: 40
+timer (seconds): 0.0015947818756103516
+-----------------------------------
+-----------------------------------
+initial state: [0, 0, [[0, 7, 1], [5, 4, 8], [6, 2, 3]]]
+number of moves: 24
+calls to move: 5410
+timer (seconds): 0.27352094650268555
+-----------------------------------
+-----------------------------------
+initial state: [0, 2, [[5, 4, 0], [2, 3, 1], [8, 7, 6]]]
+number of moves: 22
+calls to move: 4679
+timer (seconds): 0.2327888011932373
+-----------------------------------
+-----------------------------------
+initial state: [2, 1, [[8, 6, 7], [2, 5, 4], [3, 0, 1]]]
+number of moves: 31
+calls to move: 63510
+timer (seconds): 3.4640450477600098
+-----------------------------------
+"""
+"""
+Iterative Deepening A* Search program created to solve the 8-tile 
+puzzle problem.
 
-goal_state = [2, 2, [[1, 2, 3], [4, 5, 6], [7, 8, 0]]]
-goal_pos_dict = {
+This program assumes a pre-set goal state (_goal_state).
+
+Puzzles are in form of lists of lists. I.e.
+    [2, 1, [[8, 6, 7], [2, 5, 4], [3, 0, 1]]]
+Meaning that the blank tile is in position (2, 1) and the puzzle looks
+like so;
+    8, 6, 7
+    2, 5, 4
+    3, 0, 1
+
+@author: Patryk Dobbek, p.dobbek@uea.ac.uk, 100023818
+"""
+
+# Global variables
+_goal_state = [2, 2, [[1, 2, 3], [4, 5, 6], [7, 8, 0]]]
+_goal_pos_dict = {
             1: (0, 0), 2: (0, 1), 3: (0, 2),
             4: (1, 0), 5: (1, 1), 6: (1, 2),
             7: (2, 0), 8: (2, 1), 0: (2, 2)
-        }
-move_counter = 0
+        }  # dict that matches tile values to their goal-state positions.
+_move_counter = 0  # how many calls to Node.move() were performed
 
 
 class Node:
     """
-    Class describing a state of an n-tile puzzle.
+    Class describing a state of a 8-tile puzzle.
     """
 
     def __init__(self, state, g=0):
@@ -37,7 +121,7 @@ class Node:
     def blank_pos(self) -> (int, int):
         """
         :return: (int, int)
-            co-ordinates of the 0 tile.
+            co-ordinates of the 0 tile (row, column).
         """
         return self.state[0], self.state[1]
 
@@ -54,33 +138,25 @@ class Node:
     def is_goal(self) -> bool:
         """
         :return: bool
-            True if this Node contains a state identical to the goal
-            state. False otherwise.
+            True if this Node is 0 distance away from the goal state.
+            False otherwise.
         """
         return self.h == 0
 
     def __calculate_h(self) -> int:
-        # expression to programmatically find goal row and column of any value,
-        # for a puzzle of any size (doesn't have to be square). The goal state
-        # has to follow format of 1, 2, 3, 4, 5, 6, .. 0.
-        # v = value, n = number of column
-        # (v-1)%n <- column
-        # floor((v-1)/3) <- row
+        """
+        This function calculates the approximate distance to the goal
+        state by summing the Manhattan distances of all tiles and their
+        goal state.
+        :return: int
+            h - approximate distance to the goal state.
+        """
         h = 0
         for i in range(len(self.grid)):
             for j in range(len(self.grid[i])):
-                goal_pos = self.__goal_position(self.grid[i][j])
+                goal_pos = _goal_pos_dict[self.grid[i][j]]
                 h += abs(i - goal_pos[0]) + abs(j - goal_pos[1])
         return h
-
-    def __goal_position(self, v) -> (int, int):
-        n = len(self.grid[0])  # number of columns
-        m = len(self.grid)  # number of rows
-        if v == 0:
-            return (n-1), (m-1)  # blank tile at the end of puzzle
-        row = math.floor((v - 1) / n)
-        column = (v - 1) % n
-        return row, column
 
     def move(self):  # node
         """
@@ -91,8 +167,8 @@ class Node:
         :return:
             new Node with state after blank tile move.
         """
-        global move_counter
-        move_counter += 1
+        global _move_counter
+        _move_counter += 1
         [i, j, grid] = self.state
         for pos in self._move_blank():
             i1, j1 = pos
@@ -150,7 +226,7 @@ def _ida_star(root) -> list:
         8-tile puzzle state represented by a list of lists. I.e.
             [0, 0, [[0, 7, 1], [4, 3, 2], [8, 6, 5]]]
     :return: list
-        solution 8-tile puzzle state that is the solution.
+        list of Nodes that make up the path to the solution.
     """
     depth = root.f
     path = [root]
@@ -162,10 +238,18 @@ def _ida_star(root) -> list:
 
 
 def _ida_star_search(path, depth) -> (int, Node):
+    """
+    Recursive search function for solving the puzzle.
+    :param path: list
+        list of ancestor Nodes.
+    :param depth: int
+        maximum depth to expand to.
+    :return: (int, Node)
+        int - lowest f score found among the explored Nodes.
+        Node - goal Node if found, the arg Node if not.
+    """
     node = path[-1]
-    if node.f > depth:
-        return node.f, node
-    if node.is_goal:
+    if node.f > depth or node.is_goal:
         return node.f, node
 
     lowest_f = sys.maxsize
@@ -190,8 +274,8 @@ def solve(puzzle) -> list:
         list of 8-tile puzzle states that forms the path to the solution.
         Solution is at index [-1]. Initial state is at index [0].
     """
-    global move_counter
-    move_counter = 0  # reset global var
+    global _move_counter
+    _move_counter = 0  # reset global var
 
     start_time = time.time()
     solution = _ida_star(puzzle)[-1]
@@ -200,14 +284,13 @@ def solve(puzzle) -> list:
     print('-----------------------------------')
     print('initial state:', puzzle)
     print('number of moves:', solution.g)
-    print('calls to move:', move_counter)
+    print('calls to move:', _move_counter)
     print('timer (seconds):', (end_time - start_time))
     print('-----------------------------------')
     return solution
 
 
 def main():
-    global move_counter
     initial_states = [
         [0, 0, [[0, 7, 1], [4, 3, 2], [8, 6, 5]]],
         [0, 2, [[5, 6, 0], [1, 3, 8], [4, 7, 2]]],
