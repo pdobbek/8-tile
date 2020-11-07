@@ -5,68 +5,68 @@ import time  # used only in solve() function.
 -----------------------------------
 initial state: [0, 0, [[0, 7, 1], [4, 3, 2], [8, 6, 5]]]
 number of moves: 16
-calls to move: 31240
-timer (seconds): 0.8532953262329102
+calls to move: 85994
+timer (seconds): 0.9024989604949951
 -----------------------------------
 -----------------------------------
 initial state: [0, 2, [[5, 6, 0], [1, 3, 8], [4, 7, 2]]]
 number of moves: 18
-calls to move: 88782
-timer (seconds): 2.418712615966797
+calls to move: 243523
+timer (seconds): 2.4643056392669678
 -----------------------------------
 -----------------------------------
 initial state: [2, 0, [[3, 5, 6], [1, 2, 7], [0, 8, 4]]]
 number of moves: 20
-calls to move: 187645
-timer (seconds): 5.135307550430298
+calls to move: 511213
+timer (seconds): 5.173791408538818
 -----------------------------------
 -----------------------------------
 initial state: [1, 1, [[7, 3, 5], [4, 0, 2], [8, 1, 6]]]
 number of moves: 18
-calls to move: 108776
-timer (seconds): 2.988727569580078
+calls to move: 298555
+timer (seconds): 3.108302354812622
 -----------------------------------
 -----------------------------------
 initial state: [2, 0, [[6, 4, 8], [7, 1, 3], [0, 2, 5]]]
 number of moves: 18
-calls to move: 69761
-timer (seconds): 1.9120571613311768
+calls to move: 190501
+timer (seconds): 2.139713764190674
 -----------------------------------
 -----------------------------------
 initial state: [0, 2, [[3, 2, 0], [6, 1, 8], [4, 7, 5]]]
 number of moves: 18
-calls to move: 86344
-timer (seconds): 2.3629047870635986
+calls to move: 236727
+timer (seconds): 2.5022804737091064
 -----------------------------------
 -----------------------------------
 initial state: [0, 0, [[0, 1, 8], [3, 6, 7], [5, 4, 2]]]
 number of moves: 20
-calls to move: 252064
-timer (seconds): 6.959729194641113
+calls to move: 692005
+timer (seconds): 7.620138645172119
 -----------------------------------
 -----------------------------------
 initial state: [2, 0, [[6, 4, 1], [7, 3, 2], [0, 5, 8]]]
 number of moves: 14
-calls to move: 6822
-timer (seconds): 0.18247771263122559
+calls to move: 18570
+timer (seconds): 0.1946868896484375
 -----------------------------------
 -----------------------------------
 initial state: [0, 0, [[0, 7, 1], [5, 4, 8], [6, 2, 3]]]
 number of moves: 24
-calls to move: 1737297
-timer (seconds): 47.92298460006714
+calls to move: 4737798
+timer (seconds): 60.1759307384491
 -----------------------------------
 -----------------------------------
 initial state: [0, 2, [[5, 4, 0], [2, 3, 1], [8, 7, 6]]]
 number of moves: 22
-calls to move: 571704
-timer (seconds): 15.704419136047363
+calls to move: 1558399
+timer (seconds): 17.633739948272705
 -----------------------------------
 -----------------------------------
 initial state: [2, 1, [[8, 6, 7], [2, 5, 4], [3, 0, 1]]]
 number of moves: 31
-calls to move: 81492316
-timer (seconds): 2452.2423148155212
+calls to move: 221466957
+timer (seconds): 2737.8358931541443
 -----------------------------------
 """
 """
@@ -142,10 +142,11 @@ def move(state):
         state after blank tile move.
     """
     global _move_counter
-    _move_counter += 1
+
     [i, j, grid] = state  # make note of current state
     n = len(grid)
     for pos in move_blank(i, j, n):
+        _move_counter += 1
         i1, j1 = pos
         new_grid = copy.deepcopy(grid)
         new_grid[i][j], new_grid[i1][j1] = grid[i1][j1], grid[i][j]  # swap

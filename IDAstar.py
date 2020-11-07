@@ -6,68 +6,68 @@ import time
 -----------------------------------
 initial state: [0, 0, [[0, 7, 1], [4, 3, 2], [8, 6, 5]]]
 number of moves: 16
-calls to move: 251
-timer (seconds): 0.012261390686035156
+calls to move: 263
+timer (seconds): 0.007998466491699219
 -----------------------------------
 -----------------------------------
 initial state: [0, 2, [[5, 6, 0], [1, 3, 8], [4, 7, 2]]]
 number of moves: 18
-calls to move: 725
-timer (seconds): 0.035470008850097656
+calls to move: 1056
+timer (seconds): 0.0350649356842041
 -----------------------------------
 -----------------------------------
 initial state: [2, 0, [[3, 5, 6], [1, 2, 7], [0, 8, 4]]]
 number of moves: 20
-calls to move: 1043
-timer (seconds): 0.06723213195800781
+calls to move: 721
+timer (seconds): 0.020375967025756836
 -----------------------------------
 -----------------------------------
 initial state: [1, 1, [[7, 3, 5], [4, 0, 2], [8, 1, 6]]]
 number of moves: 18
-calls to move: 1591
-timer (seconds): 0.07620549201965332
+calls to move: 1310
+timer (seconds): 0.04082608222961426
 -----------------------------------
 -----------------------------------
 initial state: [2, 0, [[6, 4, 8], [7, 1, 3], [0, 2, 5]]]
 number of moves: 18
-calls to move: 211
-timer (seconds): 0.00981593132019043
+calls to move: 360
+timer (seconds): 0.010000467300415039
 -----------------------------------
 -----------------------------------
 initial state: [0, 2, [[3, 2, 0], [6, 1, 8], [4, 7, 5]]]
 number of moves: 18
-calls to move: 389
-timer (seconds): 0.017934322357177734
+calls to move: 538
+timer (seconds): 0.015775680541992188
 -----------------------------------
 -----------------------------------
 initial state: [0, 0, [[0, 1, 8], [3, 6, 7], [5, 4, 2]]]
 number of moves: 20
-calls to move: 136
-timer (seconds): 0.005845069885253906
+calls to move: 218
+timer (seconds): 0.006031990051269531
 -----------------------------------
 -----------------------------------
 initial state: [2, 0, [[6, 4, 1], [7, 3, 2], [0, 5, 8]]]
 number of moves: 14
-calls to move: 40
-timer (seconds): 0.0015947818756103516
+calls to move: 50
+timer (seconds): 0.002758026123046875
 -----------------------------------
 -----------------------------------
 initial state: [0, 0, [[0, 7, 1], [5, 4, 8], [6, 2, 3]]]
 number of moves: 24
-calls to move: 5410
-timer (seconds): 0.27352094650268555
+calls to move: 3176
+timer (seconds): 0.09736037254333496
 -----------------------------------
 -----------------------------------
 initial state: [0, 2, [[5, 4, 0], [2, 3, 1], [8, 7, 6]]]
 number of moves: 22
-calls to move: 4679
-timer (seconds): 0.2327888011932373
+calls to move: 4265
+timer (seconds): 0.09632992744445801
 -----------------------------------
 -----------------------------------
 initial state: [2, 1, [[8, 6, 7], [2, 5, 4], [3, 0, 1]]]
 number of moves: 31
-calls to move: 63510
-timer (seconds): 3.4640450477600098
+calls to move: 43432
+timer (seconds): 1.123173475265503
 -----------------------------------
 """
 """
@@ -95,7 +95,6 @@ _goal_pos_dict = {
             7: (2, 0), 8: (2, 1), 0: (2, 2)
         }  # dict that matches tile values to their goal-state positions.
 _move_counter = 0  # how many calls to Node.move() were performed
-
 
 class Node:
     """
@@ -154,11 +153,12 @@ class Node:
         h = 0
         for i in range(len(self.grid)):
             for j in range(len(self.grid[i])):
-                goal_pos = _goal_pos_dict[self.grid[i][j]]
-                h += abs(i - goal_pos[0]) + abs(j - goal_pos[1])
+                if self.grid[i][j] != 0:
+                    goal_pos = _goal_pos_dict[self.grid[i][j]]
+                    h += abs(i - goal_pos[0]) + abs(j - goal_pos[1])
         return h
 
-    def move(self):  # node
+    def move(self):  # ->node
         """
         Generator which yields a new state for each possible move after moving
         the blank tile with _move_blank function.
@@ -168,9 +168,9 @@ class Node:
             new Node with state after blank tile move.
         """
         global _move_counter
-        _move_counter += 1
         [i, j, grid] = self.state
         for pos in self._move_blank():
+            _move_counter += 1
             i1, j1 = pos
             new_grid = copy.deepcopy(grid)
             new_grid[i][j], new_grid[i1][j1] = grid[i1][j1], grid[i][j]  # swap
@@ -232,8 +232,8 @@ def _ida_star(root) -> list:
     path = [root]
     while True:
         search_result = _ida_star_search(path, depth)
-        if search_result[1].is_goal:
-            return path
+        if search_result[1][-1].is_goal:
+            return search_result[1]
         depth = search_result[0]
 
 
@@ -250,19 +250,18 @@ def _ida_star_search(path, depth) -> (int, Node):
     """
     node = path[-1]
     if node.f > depth or node.is_goal:
-        return node.f, node
+        return node.f, path
 
     lowest_f = sys.maxsize
     for child in node.move():
         if child not in path:
-            path.append(child)
-            search_result = _ida_star_search(path, depth)
-            if search_result[1].is_goal:
+            next_path = path + [child]
+            search_result = _ida_star_search(next_path, depth)
+            if search_result[1][-1].is_goal:
                 return search_result[0], search_result[1]
-            if search_result[0] < lowest_f:
+            if lowest_f > search_result[0]:
                 lowest_f = search_result[0]
-            path.pop()
-    return lowest_f, node
+    return lowest_f, path
 
 
 def solve(puzzle) -> list:
