@@ -1,74 +1,5 @@
 import copy  # used only in move(state) function.
 import time  # used only in solve() function.
-
-"""
------------------------------------
-initial state: [0, 0, [[0, 7, 1], [4, 3, 2], [8, 6, 5]]]
-number of moves: 16
-calls to move: 85994
-timer (seconds): 0.9024989604949951
------------------------------------
------------------------------------
-initial state: [0, 2, [[5, 6, 0], [1, 3, 8], [4, 7, 2]]]
-number of moves: 18
-calls to move: 243523
-timer (seconds): 2.4643056392669678
------------------------------------
------------------------------------
-initial state: [2, 0, [[3, 5, 6], [1, 2, 7], [0, 8, 4]]]
-number of moves: 20
-calls to move: 511213
-timer (seconds): 5.173791408538818
------------------------------------
------------------------------------
-initial state: [1, 1, [[7, 3, 5], [4, 0, 2], [8, 1, 6]]]
-number of moves: 18
-calls to move: 298555
-timer (seconds): 3.108302354812622
------------------------------------
------------------------------------
-initial state: [2, 0, [[6, 4, 8], [7, 1, 3], [0, 2, 5]]]
-number of moves: 18
-calls to move: 190501
-timer (seconds): 2.139713764190674
------------------------------------
------------------------------------
-initial state: [0, 2, [[3, 2, 0], [6, 1, 8], [4, 7, 5]]]
-number of moves: 18
-calls to move: 236727
-timer (seconds): 2.5022804737091064
------------------------------------
------------------------------------
-initial state: [0, 0, [[0, 1, 8], [3, 6, 7], [5, 4, 2]]]
-number of moves: 20
-calls to move: 692005
-timer (seconds): 7.620138645172119
------------------------------------
------------------------------------
-initial state: [2, 0, [[6, 4, 1], [7, 3, 2], [0, 5, 8]]]
-number of moves: 14
-calls to move: 18570
-timer (seconds): 0.1946868896484375
------------------------------------
------------------------------------
-initial state: [0, 0, [[0, 7, 1], [5, 4, 8], [6, 2, 3]]]
-number of moves: 24
-calls to move: 4737798
-timer (seconds): 60.1759307384491
------------------------------------
------------------------------------
-initial state: [0, 2, [[5, 4, 0], [2, 3, 1], [8, 7, 6]]]
-number of moves: 22
-calls to move: 1558399
-timer (seconds): 17.633739948272705
------------------------------------
------------------------------------
-initial state: [2, 1, [[8, 6, 7], [2, 5, 4], [3, 0, 1]]]
-number of moves: 31
-calls to move: 221466957
-timer (seconds): 2737.8358931541443
------------------------------------
-"""
 """
 Iterative Deepening Search program using Depth First Search to solve the
 8-tile puzzle problem.
@@ -81,7 +12,7 @@ like so;
     2, 5, 4
     3, 0, 1
 
-@author: Patryk Dobbek, p.dobbek@uea.ac.uk, 100023818
+@author: Patryk Dobbek, p.dobbek@pm.me
 """
 
 # Global variables
